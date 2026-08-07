@@ -2,67 +2,91 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Guest Service</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Guest Verification</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f8f9fa;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.card{background:#fff;border-radius:16px;padding:32px 24px;max-width:380px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,0.08);text-align:center}
-h1{font-size:1.4rem;margin-bottom:4px}
-.sub{color:#666;font-size:.9rem;margin-bottom:24px}
-label{display:block;text-align:left;font-size:.8rem;font-weight:600;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
-input[type="text"],select{width:100%;padding:14px 16px;font-size:1rem;border:1.5px solid #e0e0e0;border-radius:8px;outline:none;margin-bottom:16px;-webkit-appearance:none}
-input[type="text"]:focus,select:focus{border-color:#4a7c59}
-button{width:100%;padding:16px;font-size:1rem;font-weight:600;color:#fff;background:#4a7c59;border:none;border-radius:8px;cursor:pointer}
-button:hover{background:#3d6b4a}
-.notice{margin-top:20px;font-size:.75rem;color:#999;line-height:1.5}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f9fa;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#fff;border-radius:16px;padding:40px 30px;max-width:400px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,0.08);text-align:center}
+h1{font-size:24px;margin-bottom:8px;color:#1a1a1a}
+.subtitle{color:#666;font-size:14px;margin-bottom:30px}
+input{width:100%;padding:14px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;margin-bottom:20px;transition:border-color 0.2s}
+input:focus{outline:none;border-color:#2196F3}
+button{width:100%;padding:14px;background:#2196F3;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:background 0.2s}
+button:hover{background:#1976D2}
+button:disabled{background:#90CAF9;cursor:not-allowed}
+.note{margin-top:20px;font-size:12px;color:#999}
+.loading{display:none;margin-top:16px;color:#666;font-size:14px}
+.loading.active{display:block}
 </style>
 </head>
 <body>
 <div class="card">
 <h1>Welcome</h1>
-<p class="sub">Verify your booking to access property info</p>
-<form action="https://hook.eu1.make.com/3spxeu1h076utc9pk7yn32iqlnltiy8v" method="POST">
-<input type="hidden" name="action" value="verify">
-<div>
-<label>Your Property</label>
-<select name="property" required>
-<option value="">Select your property</option>
-<option value="no16">Allison House 16</option>
-<option value="no17">Allison House 17</option>
-<option value="no1">Kings Stable 2 Rooms</option>
-<option value="no2">Apartment 2 Bath Free Parking</option>
-<option value="no4">One Room with Parking Space</option>
-<option value="no5-2">Comfortable 1 Bedroom Apartment with Free Parking Space</option>
-<option value="no6">Causewayside Free Parking 24/6</option>
-<option value="no7">Private Parking 2 Bed 2 Bath</option>
-<option value="no7a">Fabulous Apartment</option>
-<option value="no9">2 Bed 2 Bath with Private Parking</option>
-<option value="no11">Nicolson Street Two Bedrooms</option>
-<option value="no12">Cosy and spacious 2 bedrooms property with parking</option>
-<option value="no14">Free Parking Urban 2BR Apartment</option>
-<option value="no17-1">Lovely Two Bedrooms</option>
-<option value="no19">Crighton Place 2BR</option>
-<option value="no22">Relaxing Free Parking Space for One Room</option>
-<option value="no23">Modern Apartment</option>
-<option value="no25">Two Cozy Rooms in a Residential Home</option>
-<option value="no28">Adorable 2BR Apartment</option>
-<option value="no31">St Patrick Square 2BR</option>
-<option value="no41">Charming Central 2BR</option>
-<option value="no52">Free Parking Old Town Cowans 2BR</option>
-<option value="no66">Quiet 2 Bedrooms and 2 Bathrooms with Free Parking</option>
-<option value="no73">Cozy 2 Bedrooms with Private Parking Space and Garden</option>
-<option value="no86">Two Bed Apartment</option>
-<option value="no91">Victorian Marchmont</option>
-</select>
-</div>
-<div>
-<label>Booking Name</label>
-<input type="text" name="guest_name" placeholder="Your name as on the booking" required autocomplete="name">
-</div>
-<button type="submit">Find My Key</button>
+<p class="subtitle">Please enter your full name exactly as shown on your booking confirmation.</p>
+<form id="guestForm" method="POST" action="https://hook.eu1.make.com/3spxeu1h076utc9pk7yn32iqlnltiy8v" target="submitFrame">
+<input type="text" id="nameInput" name="guest_name" placeholder="Full Name (e.g. John Smith)" required autocomplete="name">
+<button type="submit" id="submitBtn">Enter</button>
 </form>
-<p class="notice">🔒 This is a secure service channel. We will never ask for payment or personal details here.</p>
+<p class="loading" id="loadingMsg">Verifying... please wait</p>
+<p class="note">If verification fails, please check spelling matches your booking exactly.</p>
 </div>
+<iframe name="submitFrame" id="submitFrame" style="display:none"></iframe>
+<script>
+const form = document.getElementById('guestForm');
+const btn = document.getElementById('submitBtn');
+const loading = document.getElementById('loadingMsg');
+const frame = document.getElementById('submitFrame');
+let attempts = 0;
+let maxAttempts = 3;
+let retryTimer = null;
+let submitted = false;
+
+form.addEventListener('submit', function(e) {
+  if (!submitted) {
+    submitted = true;
+    attempts = 1;
+    btn.disabled = true;
+    btn.textContent = 'Verifying...';
+    loading.classList.add('active');
+    startRetryTimer();
+  }
+});
+
+// Listen for redirect in iframe
+frame.addEventListener('load', function() {
+  if (attempts > 0) {
+    try {
+      const url = frame.contentWindow.location.href;
+      if (url && url.includes('info.html')) {
+        clearTimeout(retryTimer);
+        window.location.href = url;
+        return;
+      }
+    } catch(e) {
+      // Cross-origin means redirect happened - follow it
+      clearTimeout(retryTimer);
+      // If we can't read it, the 302 already redirected the iframe
+    }
+  }
+});
+
+function startRetryTimer() {
+  retryTimer = setTimeout(function() {
+    if (attempts < maxAttempts) {
+      attempts++;
+      loading.textContent = 'Retrying... attempt ' + attempts;
+      form.submit();
+      startRetryTimer();
+    } else {
+      loading.textContent = 'Connection issue. Please try again.';
+      btn.disabled = false;
+      btn.textContent = 'Enter';
+      submitted = false;
+      attempts = 0;
+    }
+  }, 5000);
+}
+</script>
 </body>
 </html>
