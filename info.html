@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Your Stay Info</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f8f9fa;min-height:100vh;padding:20px;display:flex;justify-content:center}
+.c{max-width:420px;width:100%}
+.hdr{background:#fff;border-radius:16px;padding:24px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:16px}
+.hdr h1{color:#2d5a27;font-size:1.3rem;margin-bottom:4px}
+.hdr .name{color:#333;font-size:1rem;margin-top:8px}
+.hdr .room{background:#f0f7ed;display:inline-block;padding:6px 16px;border-radius:8px;font-weight:700;color:#2d5a27;margin-top:8px}
+.btn{background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform .1s}
+.btn:hover{transform:scale(0.98)}
+.btn .ic{font-size:1.4rem}
+.btn .lb{font-size:.95rem;font-weight:600}
+.panel{background:#fff;border-radius:12px;padding:20px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:none;font-size:.9rem;line-height:1.7}
+.panel.show{display:block}
+.panel h3{margin-bottom:8px;color:#2d5a27}
+.back{text-align:center;margin-top:16px}
+.back a{color:#666;font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="c">
+<div class="hdr">
+<h1>✅ Booking Verified</h1>
+<p class="name" id="gname"></p>
+<p class="room" id="groom"></p>
+</div>
+<div class="btn" onclick="toggle('key')"><span class="ic">🔑</span><span class="lb">Key / Check-in</span></div>
+<div class="panel" id="key"><h3>🔑 Key / Check-in</h3><div id="key-content"></div></div>
+<div class="btn" onclick="toggle('parking')"><span class="ic">🚗</span><span class="lb">Parking</span></div>
+<div class="panel" id="parking"><h3>🚗 Parking</h3><div id="parking-content"></div></div>
+<div class="btn" onclick="toggle('luggage')"><span class="ic">🧳</span><span class="lb">Luggage Storage</span></div>
+<div class="panel" id="luggage"><h3>🧳 Luggage Storage</h3><div id="luggage-content"></div></div>
+<div class="btn" onclick="toggle('checkout')"><span class="ic">🕐</span><span class="lb">Check-out</span></div>
+<div class="panel" id="checkout"><h3>🕐 Check-out</h3><div id="checkout-content"></div></div>
+<div class="btn" onclick="toggle('office')"><span class="ic">🏢</span><span class="lb">Office Hours</span></div>
+<div class="panel" id="office"><h3>🏢 Office Hours</h3><div id="office-content"></div></div>
+<div class="btn" onclick="toggle('rules')"><span class="ic">🔕</span><span class="lb">House Rules</span></div>
+<div class="panel" id="rules"><h3>🔕 House Rules</h3><div id="rules-content"></div></div>
+<div class="back"><a href="guest.html">← Back to verification</a></div>
+</div>
+<script>
+const P=new URLSearchParams(location.search);
+const room=P.get('room')||'';
+const name=P.get('name')||'';
+document.getElementById('gname').textContent='Welcome, '+name;
+document.getElementById('groom').textContent=room;
+const isHotel16=room.startsWith('NO16');
+const isHotel17=room.startsWith('NO17');
+const isHotel=isHotel16||isHotel17;
+const roomNum=room.replace(/\D+/g,'').slice(-2);
+const passwords16={31:'6131',32:'6132',33:'6133',34:'6934',35:'6335',36:'6236',37:'6337',38:'6238',39:'6439',41:'6241',42:'6042',43:'6347',44:'6344',45:'6145',46:'6046',50:'6250',25:'6551'};
+const passwords17={'01':'7101','02':'7102','03':'7103','04':'7904','05':'7905','06':'7206','07':'7307','08':'7208','09':'7409','10':'7210','12':'7012','14':'7314','15':'7115','16':'7016','17':'7317','19':'7219','20':'7220','21':'7521'};
+let code='';
+if(isHotel16)code=passwords16[roomNum]||'';
+if(isHotel17)code=passwords17[roomNum]||'';
+const keyInfo=isHotel?(isHotel16?'Find the row of RED key boxes on the left side of the entrance.':'Find the row of GREY key boxes on the left side of the entrance.')+'\n\nYour locker number: '+roomNum+'\nYour code: '+code+'\n\nThe key opens BOTH the main door and your room.':'Your key information was sent via Booking.com message. Please check your Booking.com App.';
+const parkingInfo=isHotel?'There is NO parking at the hotel.\n\n⚠️ Marked bays = resident permit only (you WILL be ticketed)\n⚠️ Yellow lines = fines apply\n⚠️ The car park at No.15 next door is strictly private. Parking there = £250 fine from the owner.':'Please check the road signs in your area for parking restrictions.';
+const luggageInfo=isHotel16?'The luggage storage keys are kept in box number 49.\nPasscode: 6249\n\nYou may store your luggage in boxes A, B, C, D, E, F, or G.\n\nEach box has keys that open both the luggage box and the main door.\nPlease return the keys to box 49 once you have collected your luggage.':(isHotel17?'The luggage storage keys are kept in box number 23.\nPasscode: 1678\n\nYou may store your luggage in boxes A, B, C, D, and E.\n\nEach box has keys that open both the luggage box and the main door.\nPlease return the keys to box 23 once you have collected your luggage.':'We do not offer luggage storage at this property.\n\nPlease visit: 16 Mayfield Gardens, Edinburgh EH9 2BZ\n\nThe luggage storage keys are kept in box number 49. Passcode: 6249. Boxes A-G.');
+const checkoutInfo=isHotel?'Check-out by 10:30 AM strictly.\n\nDrop your key into the PINK key box in the lobby.':'Check-out by 10:30 AM strictly.\n\nTurn off all power. Leave the key on the dining table where it is easy to see. Lock the door.';
+const officeInfo='Office hours: 9:30 AM - 7:30 PM daily.\n\nOutside office hours, please contact us via the Booking.com App.';
+const rulesInfo='Please keep quiet to avoid disturbing other guests or residents.\n\nDo not ring any doorbells.\n\nIf you need help, please contact us via Booking.com App.';
+document.getElementById('key-content').textContent=keyInfo;
+document.getElementById('parking-content').textContent=parkingInfo;
+document.getElementById('luggage-content').textContent=luggageInfo;
+document.getElementById('checkout-content').textContent=checkoutInfo;
+document.getElementById('office-content').textContent=officeInfo;
+document.getElementById('rules-content').textContent=rulesInfo;
+function toggle(id){const el=document.getElementById(id);el.classList.toggle('show')}
+</script>
+</body>
+</html>
