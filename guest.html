@@ -14,79 +14,18 @@ input{width:100%;padding:14px 16px;border:2px solid #e0e0e0;border-radius:10px;f
 input:focus{outline:none;border-color:#2196F3}
 button{width:100%;padding:14px;background:#2196F3;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:background 0.2s}
 button:hover{background:#1976D2}
-button:disabled{background:#90CAF9;cursor:not-allowed}
 .note{margin-top:20px;font-size:12px;color:#999}
-.loading{display:none;margin-top:16px;color:#666;font-size:14px}
-.loading.active{display:block}
 </style>
 </head>
 <body>
 <div class="card">
 <h1>Welcome</h1>
 <p class="subtitle">Please enter your full name exactly as shown on your booking confirmation.</p>
-<form id="guestForm" method="POST" action="https://hook.eu1.make.com/3spxeu1h076utc9pk7yn32iqlnltiy8v" target="submitFrame">
-<input type="text" id="nameInput" name="guest_name" placeholder="Full Name (e.g. John Smith)" required autocomplete="name">
-<button type="submit" id="submitBtn">Enter</button>
+<form method="POST" action="https://hook.eu1.make.com/3spxeu1h076utc9pk7yn32iqlnltiy8v">
+<input type="text" name="guest_name" placeholder="Full Name (e.g. John Smith)" required autocomplete="name">
+<button type="submit">Enter</button>
 </form>
-<p class="loading" id="loadingMsg">Verifying... please wait</p>
 <p class="note">If verification fails, please check spelling matches your booking exactly.</p>
 </div>
-<iframe name="submitFrame" id="submitFrame" style="display:none"></iframe>
-<script>
-const form = document.getElementById('guestForm');
-const btn = document.getElementById('submitBtn');
-const loading = document.getElementById('loadingMsg');
-const frame = document.getElementById('submitFrame');
-let attempts = 0;
-let maxAttempts = 3;
-let retryTimer = null;
-let submitted = false;
-
-form.addEventListener('submit', function(e) {
-  if (!submitted) {
-    submitted = true;
-    attempts = 1;
-    btn.disabled = true;
-    btn.textContent = 'Verifying...';
-    loading.classList.add('active');
-    startRetryTimer();
-  }
-});
-
-// Listen for redirect in iframe
-frame.addEventListener('load', function() {
-  if (attempts > 0) {
-    try {
-      const url = frame.contentWindow.location.href;
-      if (url && url.includes('info.html')) {
-        clearTimeout(retryTimer);
-        window.location.href = url;
-        return;
-      }
-    } catch(e) {
-      // Cross-origin means redirect happened - follow it
-      clearTimeout(retryTimer);
-      // If we can't read it, the 302 already redirected the iframe
-    }
-  }
-});
-
-function startRetryTimer() {
-  retryTimer = setTimeout(function() {
-    if (attempts < maxAttempts) {
-      attempts++;
-      loading.textContent = 'Retrying... attempt ' + attempts;
-      form.submit();
-      startRetryTimer();
-    } else {
-      loading.textContent = 'Connection issue. Please try again.';
-      btn.disabled = false;
-      btn.textContent = 'Enter';
-      submitted = false;
-      attempts = 0;
-    }
-  }, 5000);
-}
-</script>
 </body>
 </html>
