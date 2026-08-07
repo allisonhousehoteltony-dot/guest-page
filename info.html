@@ -57,9 +57,11 @@ const room = decodeURIComponent(params.get('room') || '');
 const name = decodeURIComponent(params.get('name') || '');
 document.getElementById('guestName').textContent = name;
 
+// Hotel room passwords
 const no16pw = {31:'6131',32:'6132',33:'6133',34:'6934',35:'6335',36:'6236',37:'6337',38:'6238',39:'6439',41:'6241',42:'6042',43:'6347',44:'6344',45:'6145',46:'6046',50:'6250',25:'6551'};
 const no17pw = {'01':'7101','02':'7102','03':'7103','04':'7904','05':'7905','06':'7206','07':'7307','08':'7208','09':'7409','10':'7210','1':'7101','2':'7102','3':'7103','4':'7904','5':'7905','6':'7206','7':'7307','8':'7208','9':'7409',10:'7210',12:'7012',14:'7314',15:'7115',16:'7016',17:'7317',19:'7219',20:'7220',21:'7521'};
 
+// Apartment data: [code, keyBoxColor, address, hasParking, parkingNote]
 const apts = {
 'NO 1':['1678','','F1, 2 King\'s Stables Road, EH1 2JY',false,''],
 'NO 2':['1678','','F2, 6 Hawkhill Close, EH7 6FE',true,'Free parking available at rear of building'],
@@ -91,24 +93,25 @@ const apts = {
 
 let data = {};
 
+// Detect hotel vs apartment
 const hotelMatch = room.match(/^NO1([67])[-]+(\d+)$/);
 if (hotelMatch) {
-  const hotelNum = hotelMatch[1];
+  const hotelNum = hotelMatch[1]; // '6' or '7'
   const roomNum = hotelMatch[2];
   const hotelName = 'No 1' + hotelNum;
   const address = hotelNum === '6' ? '16 Mayfield Gardens, Edinburgh EH9 2BZ' : '17 Mayfield Gardens, Edinburgh EH9 2AX';
   const pw = hotelNum === '6' ? no16pw[parseInt(roomNum)] : (no17pw[roomNum] || no17pw[parseInt(roomNum)]);
-  const keyBoxInfo = hotelNum === '6' ? 'Key box 49, code: 6249' : 'Key box 23, code: 1678';
+  const frontDoor = hotelNum === '6' ? 'Key box 49, code: 6249' : 'Key box 23, code: 1678';
   data.key = '<p><strong>' + hotelName + ' Hotel</strong> - ' + address + '</p>' +
-    '<p>' + keyBoxInfo + '</p>' +
-    '<p><strong>This key opens both the front door and your room.</strong></p>' +
+    '<p>Front door: ' + frontDoor + '</p>' +
     '<p>Your room: <strong>Room ' + roomNum + '</strong></p>' +
-    '<p>Room keypad code (backup):</p>' +
     '<p class="code">' + (pw || '----') + '</p>' +
     '<p>Enter code on keypad, push handle down after beep.</p>';
-  data.parking = '<p>Limited parking spaces available on site. If full, free street parking is available on nearby roads.</p><p><strong>Do NOT park at No.15 as you may receive a fine.</strong></p>';
+  data.parking = hotelNum === '6' ?
+    '<p>No dedicated parking. Street parking available on Mayfield Gardens (check local signs for restrictions).</p>' :
+    '<p>No dedicated parking. Street parking available on Mayfield Gardens (check local signs for restrictions).</p>';
   data.luggage = '<p>You may store luggage in the lobby area on your check-out day.</p><p>Please collect before 6:00 PM.</p>';
-  data.checkout = '<p><strong>Check-out time: 10:30 AM</strong></p><p>Please leave the key inside the room and close the door. It will lock automatically.</p>';
+  data.checkout = '<p><strong>Check-out time: 10:00 AM</strong></p><p>Please leave the key inside the room and close the door. It will lock automatically.</p>';
   data.office = '<p>No staffed reception. For urgent matters:</p><p>Contact us via Booking.com App message (fastest response).</p>';
   data.rules = '<p>1. No smoking anywhere in the building.</p><p>2. No parties or loud noise after 10 PM.</p><p>3. No extra guests beyond those on the booking.</p><p>4. Report any damage immediately.</p>';
 } else if (apts[room]) {
@@ -127,14 +130,14 @@ if (hotelMatch) {
     '<p>' + parkingNote + '</p>' :
     '<p>No dedicated parking for this property. Street parking may be available nearby (check local signs).</p>';
   data.luggage = '<p>Please leave luggage inside the apartment on check-out day. There is no separate luggage storage.</p>';
-  data.checkout = '<p><strong>Check-out time: 10:30 AM</strong></p><p>1. Place keys back in the key box.</p><p>2. Close the door firmly (it locks automatically).</p><p>3. Scramble the key box dials.</p>';
+  data.checkout = '<p><strong>Check-out time: 10:00 AM</strong></p><p>1. Place keys back in the key box.</p><p>2. Close the door firmly (it locks automatically).</p><p>3. Scramble the key box dials.</p>';
   data.office = '<p>No staffed reception. For urgent matters:</p><p>Contact us via Booking.com App message (fastest response).</p>';
   data.rules = '<p>1. No smoking inside the property.</p><p>2. No parties or events.</p><p>3. Quiet hours: 10 PM - 8 AM.</p><p>4. Take rubbish out before departure.</p><p>5. Report any damage immediately via Booking.com.</p>';
 } else {
   data.key = '<p>Your key information was sent via Booking.com message. Please check your Booking.com App.</p>';
   data.parking = '<p>Please check your Booking.com message for parking details.</p>';
   data.luggage = '<p>Please contact us via Booking.com for luggage storage options.</p>';
-  data.checkout = '<p><strong>Check-out time: 10:30 AM</strong></p><p>Please check Booking.com message for specific instructions.</p>';
+  data.checkout = '<p><strong>Check-out time: 10:00 AM</strong></p><p>Please check Booking.com message for specific instructions.</p>';
   data.office = '<p>Contact us via Booking.com App message.</p>';
   data.rules = '<p>No smoking. No parties. Quiet hours 10 PM - 8 AM.</p>';
 }
