@@ -2,134 +2,152 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Your Stay Info</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Guest Info</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f8f9fa;min-height:100vh;padding:20px;display:flex;justify-content:center}
-.c{max-width:420px;width:100%}
-.hdr{background:#fff;border-radius:16px;padding:24px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:16px}
-.hdr h1{color:#2d5a27;font-size:1.3rem;margin-bottom:4px}
-.hdr .name{color:#333;font-size:1rem;margin-top:8px}
-.hdr .room{background:#f0f7ed;display:inline-block;padding:6px 16px;border-radius:8px;font-weight:700;color:#2d5a27;margin-top:8px}
-.btn{background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform .1s}
-.btn:hover{transform:scale(0.98)}
-.btn .ic{font-size:1.4rem}
-.btn .lb{font-size:.95rem;font-weight:600}
-.panel{background:#fff;border-radius:12px;padding:20px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:none;font-size:.9rem;line-height:1.7;white-space:pre-line}
-.panel.show{display:block}
-.panel h3{margin-bottom:8px;color:#2d5a27}
-.back{text-align:center;margin-top:16px}
-.back a{color:#666;font-size:.85rem}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f9fa;min-height:100vh;padding:20px}
+.container{max-width:500px;margin:0 auto}
+.header{background:#fff;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);text-align:center}
+.verified{display:inline-flex;align-items:center;gap:8px;background:#e8f5e9;color:#2e7d32;padding:8px 16px;border-radius:20px;font-size:14px;font-weight:600;margin-bottom:12px}
+.verified svg{width:18px;height:18px}
+.welcome{font-size:18px;color:#333}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.btn{background:#fff;border:none;border-radius:14px;padding:20px 12px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.06);cursor:pointer;transition:transform 0.1s,box-shadow 0.1s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(0,0,0,0.1)}
+.btn:active{transform:translateY(0)}
+.btn .icon{font-size:28px;margin-bottom:8px}
+.btn .label{font-size:13px;font-weight:600;color:#333}
+.info-panel{background:#fff;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);display:none}
+.info-panel.active{display:block}
+.info-panel h3{font-size:16px;margin-bottom:12px;color:#1a1a1a}
+.info-panel p{font-size:14px;color:#555;line-height:1.6}
+.info-panel .code{font-size:28px;font-weight:700;color:#2196F3;letter-spacing:2px;margin:12px 0}
+.back-link{text-align:center;margin-top:16px}
+.back-link a{color:#666;font-size:13px;text-decoration:none}
+.security{background:#fff;border-radius:16px;padding:16px;text-align:center;font-size:11px;color:#999;box-shadow:0 2px 10px rgba(0,0,0,0.06)}
 </style>
 </head>
 <body>
-<div class="c">
-<div class="hdr">
-<h1>✅ Booking Verified</h1>
-<p class="name" id="gname"></p>
-<p class="room" id="groom"></p>
+<div class="container">
+<div class="header">
+<div class="verified"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Booking Verified</div>
+<p class="welcome">Welcome, <span id="guestName"></span></p>
 </div>
-<div class="btn" onclick="toggle('key')"><span class="ic">🔑</span><span class="lb">Key / Check-in</span></div>
-<div class="panel" id="key"><h3>🔑 Key / Check-in</h3><div id="key-content"></div></div>
-<div class="btn" onclick="toggle('parking')"><span class="ic">🚗</span><span class="lb">Parking</span></div>
-<div class="panel" id="parking"><h3>🚗 Parking</h3><div id="parking-content"></div></div>
-<div class="btn" onclick="toggle('luggage')"><span class="ic">🧳</span><span class="lb">Luggage Storage</span></div>
-<div class="panel" id="luggage"><h3>🧳 Luggage Storage</h3><div id="luggage-content"></div></div>
-<div class="btn" onclick="toggle('checkout')"><span class="ic">🕐</span><span class="lb">Check-out</span></div>
-<div class="panel" id="checkout"><h3>🕐 Check-out</h3><div id="checkout-content"></div></div>
-<div class="btn" onclick="toggle('office')"><span class="ic">🏢</span><span class="lb">Office Hours</span></div>
-<div class="panel" id="office"><h3>🏢 Office Hours</h3><div id="office-content"></div></div>
-<div class="btn" onclick="toggle('rules')"><span class="ic">🔕</span><span class="lb">House Rules</span></div>
-<div class="panel" id="rules"><h3>🔕 House Rules</h3><div id="rules-content"></div></div>
-<div class="back"><a href="guest.html">← Back to verification</a></div>
+<div class="buttons">
+<div class="btn" onclick="show('key')"><div class="icon">🔑</div><div class="label">Key / Check-in</div></div>
+<div class="btn" onclick="show('parking')"><div class="icon">🚗</div><div class="label">Parking</div></div>
+<div class="btn" onclick="show('luggage')"><div class="icon">🧳</div><div class="label">Luggage Storage</div></div>
+<div class="btn" onclick="show('checkout')"><div class="icon">🏁</div><div class="label">Check-out</div></div>
+<div class="btn" onclick="show('office')"><div class="icon">🏢</div><div class="label">Office Hours</div></div>
+<div class="btn" onclick="show('rules')"><div class="icon">📋</div><div class="label">House Rules</div></div>
+</div>
+<div class="info-panel" id="panel-key"><h3>🔑 Key / Check-in</h3><div id="info-key"></div></div>
+<div class="info-panel" id="panel-parking"><h3>🚗 Parking</h3><div id="info-parking"></div></div>
+<div class="info-panel" id="panel-luggage"><h3>🧳 Luggage Storage</h3><div id="info-luggage"></div></div>
+<div class="info-panel" id="panel-checkout"><h3>🏁 Check-out</h3><div id="info-checkout"></div></div>
+<div class="info-panel" id="panel-office"><h3>🏢 Office Hours</h3><div id="info-office"></div></div>
+<div class="info-panel" id="panel-rules"><h3>📋 House Rules</h3><div id="info-rules"></div></div>
+<div class="back-link"><a href="guest.html">&larr; Back to verification</a></div>
+<div class="security">🔒 This is a secure service channel. We will never ask for payment or personal details here.</div>
 </div>
 <script>
-const P=new URLSearchParams(location.search);
-const room=(P.get('room')||'').trim();
-const roomUP=room.toUpperCase();
-const name=decodeURIComponent(P.get('name')||'');
-document.getElementById('gname').textContent='Welcome, '+name;
-document.getElementById('groom').textContent=room;
+const params = new URLSearchParams(window.location.search);
+const room = decodeURIComponent(params.get('room') || '');
+const name = decodeURIComponent(params.get('name') || '');
+document.getElementById('guestName').textContent = name;
 
-const isH16=roomUP.indexOf('NO16-')===0;
-const isH17=roomUP.indexOf('NO17-')===0 && roomUP.indexOf('NO17-1')!==0;
-const isHotel=isH16||isH17;
+// Hotel room passwords
+const no16pw = {31:'6131',32:'6132',33:'6133',34:'6934',35:'6335',36:'6236',37:'6337',38:'6238',39:'6439',41:'6241',42:'6042',43:'6347',44:'6344',45:'6145',46:'6046',50:'6250',25:'6551'};
+const no17pw = {'01':'7101','02':'7102','03':'7103','04':'7904','05':'7905','06':'7206','07':'7307','08':'7208','09':'7409','10':'7210','1':'7101','2':'7102','3':'7103','4':'7904','5':'7905','6':'7206','7':'7307','8':'7208','9':'7409',10:'7210',12:'7012',14:'7314',15:'7115',16:'7016',17:'7317',19:'7219',20:'7220',21:'7521'};
 
-let roomNum='';
-if(isHotel){roomNum=roomUP.split('-')[1]||'';}
-
-const pw16={'25':'6551','31':'6131','32':'6132','33':'6133','34':'6934','35':'6335','36':'6236','37':'6337','38':'6238','39':'6439','41':'6241','42':'6042','43':'6347','44':'6344','45':'6145','46':'6046','50':'6250'};
-const pw17={'1':'7101','2':'7102','3':'7103','4':'7904','5':'7905','6':'7206','7':'7307','8':'7208','9':'7409','10':'7210','12':'7012','14':'7314','15':'7115','16':'7016','17':'7317','19':'7219','20':'7220','21':'7521'};
-
-const apts={
-'NO 17/1':{key:'Find black door number 17. ORANGE key box on the left side (NOT the purple one next to it).\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 7A':{key:'Stone building. Light blue door number 7. Row of key boxes. Look for the BLUE key box at the bottom.\nCode: 7307\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 5/2':{key:'After arriving at number 5, find the RED key box on the window ledge.\nCode: 2378\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find the brown door marked "2".',parking:'Find the parking card on the cabinet. Place on windshield. East Preston Street, number 24.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 66':{key:'Find building number 66. RED key box on the window ledge.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.\nPress button 66 on the intercom to open main door. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 73':{key:'White house. Door number 73. RED key box next to the front door.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Take the blue key.',parking:'Private parking in the driveway.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 86':{key:'Blue door number 86. ORANGE key box next to the window.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Take the blue key.',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 41':{key:'Find the iron gate (number 4, arrow pointing left). Main door code: C1369Z\nWalk through corridor to balcony area. Find the red door with GREEN key box.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 25':{key:'Red building. Red door number 255. Several key boxes. Look for the BLUE key box.\nCode: 7307\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "2".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 23':{key:'Find green door number 23. Row of key boxes. Look for the BLUE key box (circled in red).\nCode: 7307\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 22':{key:'Find the BLUE key box on door number 24.\nCode: 7307\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Your apartment is number 4 in building 22.',parking:'Find the parking card on the cabinet. Place it on your windshield.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 14':{key:'Enter from Gilmour Street entrance (marked NO 1 Entrance). Inside, find the BLUE key box on the door frame.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door number 4.',parking:'Private parking on Gilmour Street, space marked 1/4.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 12':{key:'Cosy and spacious 2 bedrooms property with parking.\nFind the GREY key box on the wall to the right.\nCode: 7206\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.',parking:'Private parking to the left of the property. Your space is number 7.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 11':{key:'Find door number 108 (black door). GREY key box on the door frame.\nCode: 7206\nAfter getting the key:\n1. Do NOT enter 108. Walk to door number 110\n2. Hold the sensor key against the white door panel\n3. Find the white door marked "2"\n4. Use the key to open it',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 9':{key:'Yellow brick building. Blue door number 9. GREY key box (Master Lock) on the wall.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.',parking:'Private parking to the left of the property. Your space is number 9.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 7':{key:'Yellow brick building. Find the blue door number 7. RED key box on the door.\nCode: 7206\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.',parking:'Private parking to the left of the property. Your space is number 7.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 6':{key:'At door number 24, find the RED key box on the iron railing (far left).\nCode: 7521\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door number 6.',parking:'Find the parking card on the cabinet. Place on windshield. East Preston Street, number 24.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 4':{key:'At door number 24, find the RED key box on the iron railing (far right).\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door number 4.',parking:'Find the parking card on the cabinet. Place it on your windshield.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 2':{key:'Find the RED key box at door number 6 (circled in red).\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Enter via intercom, find door number 2.',parking:'Parking is at the end of the corridor at door 6.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 1':{key:'Find the green door (number 2). Look for the ORANGE key box on the wall.\nCode: 1678\nAlign code on dials \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.'}
+// Apartment data: [code, keyBoxColor, address, hasParking, parkingNote]
+const apts = {
+'NO 1':['1678','','F1, 2 King\'s Stables Road, EH1 2JY',false,''],
+'NO 2':['1678','','F2, 6 Hawkhill Close, EH7 6FE',true,'Free parking available at rear of building'],
+'NO 4':['1678','','24-4 Causewayside, EH9 1QB',true,'Free parking space in front of building'],
+'NO 5/2':['2378','','5/2 Sciennes House Place, EH9 1NN',true,'Free parking space included'],
+'NO 5A':['1678','','5A Pirrie Street, EH6 5HU',false,''],
+'NO 6':['7521','','24/6 Causewayside, EH9 1QB',true,'Free parking space in front of building'],
+'NO 7':['7206','','7 Mentone Gardens, EH9 2DJ',true,'Private parking in driveway'],
+'NO 7A':['7307','purple','7/1 Upper Grove Place, EH3 8AY',false,''],
+'NO 9':['1678','','9 Mentone Gardens, EH9 2DJ',true,'Private parking in driveway'],
+'NO 11':['7206','','110-2 Nicolson Street, EH8 9EJ',false,''],
+'NO 12':['7307','','12 Mentone Terrace, EH9 2DF',true,'Parking space: 11'],
+'NO 14':['1678','blue','1/4 Gilmours Entry, EH8 9XL',true,'Free parking space included'],
+'NO 17/1':['1678','','GP1, 17 Upper Grove Place, EH3 8AX',false,''],
+'NO 18':['1678','','Flat 11, 18 Terrars Croft, EH8 9RE',false,''],
+'NO 22':['7307','','22-4 Causewayside, EH9 1QB',true,'Free parking space in front of building'],
+'NO 23':['7307','blue','23/2 Livingstone Place, EH9 1PD',false,''],
+'NO 25':['7307','blue','255/2 Canongate, EH8 8BQ',false,''],
+'NO 41':['1678','','4/1 Tron Square, EH1 1RR',false,''],
+'NO 66':['1678','','Flat 1, 66 Ferry Gait Drive, EH4 4GJ',true,'Free parking available'],
+'NO 73':['1678','','73 Ravenswood Avenue, EH16 5TG',true,'Private parking space + garden'],
+'NO 86':['1678','','GF1, 86 Grove Street, EH3 8AP',false,''],
+'NO 19':['1678','red','19 (1F3) Crighton Place, EH7 4NY',false,''],
+'NO 28':['1678','red','28 Upper Gray Street, EH9 1SW',true,'Private parking included'],
+'NO 31':['1678','red','31 (2F2) St Patrick Square, EH8 9EU',false,''],
+'NO 52':['1678','red','5/2 Cowan\'s Close, EH8 9HF',true,'Free parking available'],
+'NO 91':['1678','red','9/1 Livingstone Place, EH9 1PA',false,'']
 };
 
-let aptData=null;
-if(!isHotel){
-  const r=room.toUpperCase().trim();
-  if(apts[r]){aptData=apts[r];}
-  else{
-    const r2=r.replace(/-/g,' ').replace(/\s+/g,' ').trim();
-    if(apts[r2]){aptData=apts[r2];}
-  }
+let data = {};
+
+// Detect hotel vs apartment
+const hotelMatch = room.match(/^NO1([67])[-]+(\d+)$/);
+if (hotelMatch) {
+  const hotelNum = hotelMatch[1]; // '6' or '7'
+  const roomNum = hotelMatch[2];
+  const hotelName = 'No 1' + hotelNum;
+  const address = hotelNum === '6' ? '16 Mayfield Gardens, Edinburgh EH9 2BZ' : '17 Mayfield Gardens, Edinburgh EH9 2AX';
+  const pw = hotelNum === '6' ? no16pw[parseInt(roomNum)] : (no17pw[roomNum] || no17pw[parseInt(roomNum)]);
+  const frontDoor = hotelNum === '6' ? 'Key box 49, code: 6249' : 'Key box 23, code: 1678';
+  data.key = '<p><strong>' + hotelName + ' Hotel</strong> - ' + address + '</p>' +
+    '<p>Front door: ' + frontDoor + '</p>' +
+    '<p>Your room: <strong>Room ' + roomNum + '</strong></p>' +
+    '<p class="code">' + (pw || '----') + '</p>' +
+    '<p>Enter code on keypad, push handle down after beep.</p>';
+  data.parking = hotelNum === '6' ?
+    '<p>No dedicated parking. Street parking available on Mayfield Gardens (check local signs for restrictions).</p>' :
+    '<p>No dedicated parking. Street parking available on Mayfield Gardens (check local signs for restrictions).</p>';
+  data.luggage = '<p>You may store luggage in the lobby area on your check-out day.</p><p>Please collect before 6:00 PM.</p>';
+  data.checkout = '<p><strong>Check-out time: 10:00 AM</strong></p><p>Please leave the key inside the room and close the door. It will lock automatically.</p>';
+  data.office = '<p>No staffed reception. For urgent matters:</p><p>Contact us via Booking.com App message (fastest response).</p>';
+  data.rules = '<p>1. No smoking anywhere in the building.</p><p>2. No parties or loud noise after 10 PM.</p><p>3. No extra guests beyond those on the booking.</p><p>4. Report any damage immediately.</p>';
+} else if (apts[room]) {
+  const a = apts[room];
+  const code = a[0];
+  const boxColor = a[1];
+  const address = a[2];
+  const hasParking = a[3];
+  const parkingNote = a[4];
+  const boxText = boxColor ? 'Find the ' + boxColor + ' key box near the entrance.' : 'Find the key box near the entrance.';
+  data.key = '<p><strong>Address:</strong> ' + address + '</p>' +
+    '<p>' + boxText + '</p>' +
+    '<p class="code">' + code + '</p>' +
+    '<p>Turn each dial to align the numbers. Press the black button at the bottom and pull the cover outward.</p>';
+  data.parking = hasParking ?
+    '<p>' + parkingNote + '</p>' :
+    '<p>No dedicated parking for this property. Street parking may be available nearby (check local signs).</p>';
+  data.luggage = '<p>Please leave luggage inside the apartment on check-out day. There is no separate luggage storage.</p>';
+  data.checkout = '<p><strong>Check-out time: 10:00 AM</strong></p><p>1. Place keys back in the key box.</p><p>2. Close the door firmly (it locks automatically).</p><p>3. Scramble the key box dials.</p>';
+  data.office = '<p>No staffed reception. For urgent matters:</p><p>Contact us via Booking.com App message (fastest response).</p>';
+  data.rules = '<p>1. No smoking inside the property.</p><p>2. No parties or events.</p><p>3. Quiet hours: 10 PM - 8 AM.</p><p>4. Take rubbish out before departure.</p><p>5. Report any damage immediately via Booking.com.</p>';
+} else {
+  data.key = '<p>Your key information was sent via Booking.com message. Please check your Booking.com App.</p>';
+  data.parking = '<p>Please check your Booking.com message for parking details.</p>';
+  data.luggage = '<p>Please contact us via Booking.com for luggage storage options.</p>';
+  data.checkout = '<p><strong>Check-out time: 10:00 AM</strong></p><p>Please check Booking.com message for specific instructions.</p>';
+  data.office = '<p>Contact us via Booking.com App message.</p>';
+  data.rules = '<p>No smoking. No parties. Quiet hours 10 PM - 8 AM.</p>';
 }
 
-let keyInfo='',parkingInfo='',luggageInfo='',checkoutInfo='';
-if(isH16){
-  const code=pw16[roomNum]||'(check Booking.com message)';
-  keyInfo='Find the row of RED key boxes on the left side of the entrance.\nYour locker number: '+roomNum+'\nYour code: '+code+'\nThe key opens BOTH the main door and your room.';
-  parkingInfo='There is NO parking at the hotel.\n\n\u26a0\ufe0f Marked bays = resident permit only (you WILL be ticketed)\n\u26a0\ufe0f Yellow lines = fines apply\n\u26a0\ufe0f The car park at No.15 next door is strictly private. Parking there = \u00a3250 fine from the owner.';
-  luggageInfo='The luggage storage keys are kept in box number 49.\nPasscode: 6249\nBoxes A, B, C, D, E, F, or G.\nEach box has keys that open both the luggage box and the main door.\nReturn the keys to box 49 after collecting your luggage.';
-  checkoutInfo='Check-out by 10:30 AM strictly.\nDrop your key into the PINK key box in the lobby.';
-}else if(isH17){
-  const code=pw17[roomNum]||pw17[String(Number(roomNum))]||'(check Booking.com message)';
-  keyInfo='Find the row of GREY key boxes on the left side of the entrance.\nYour locker number: '+roomNum+'\nYour code: '+code+'\nThe key opens BOTH the main door and your room.';
-  parkingInfo='There is NO parking at the hotel.\n\n\u26a0\ufe0f Marked bays = resident permit only (you WILL be ticketed)\n\u26a0\ufe0f Yellow lines = fines apply\n\u26a0\ufe0f The car park at No.15 next door is strictly private. Parking there = \u00a3250 fine from the owner.';
-  luggageInfo='The luggage storage keys are kept in box number 23.\nPasscode: 1678\nBoxes A, B, C, D, and E.\nEach box has keys that open both the luggage box and the main door.\nReturn the keys to box 23 after collecting your luggage.';
-  checkoutInfo='Check-out by 10:30 AM strictly.\nDrop your key into the PINK key box in the lobby.';
-}else if(aptData){
-  keyInfo=aptData.key;
-  parkingInfo=aptData.parking;
-  luggageInfo='We do not offer luggage storage at this property.\nPlease visit: 16 Mayfield Gardens, Edinburgh EH9 2BZ\nBox 49, Passcode: 6249. Boxes A-G.';
-  checkoutInfo=aptData.co;
-}else{
-  keyInfo='Your key information was sent via Booking.com message.\nPlease check your Booking.com App.';
-  parkingInfo='Please check the road signs in your area for parking restrictions.';
-  luggageInfo='Please visit: 16 Mayfield Gardens, Edinburgh EH9 2BZ\nBox 49, Passcode: 6249. Boxes A-G.';
-  checkoutInfo='Check-out by 10:30 AM. Turn off all power. Leave the key on the dining table. Lock the door.';
+function show(section) {
+  document.querySelectorAll('.info-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + section);
+  document.getElementById('info-' + section).innerHTML = data[section];
+  panel.classList.add('active');
 }
-
-const officeInfo='Office hours: 9:30 AM - 7:30 PM daily.\nOutside office hours, please contact us via the Booking.com App.';
-const rulesInfo='Please keep quiet to avoid disturbing other guests or residents.\nDo not ring any doorbells.\nIf you need help, please contact us via Booking.com App.';
-
-document.getElementById('key-content').textContent=keyInfo;
-document.getElementById('parking-content').textContent=parkingInfo;
-document.getElementById('luggage-content').textContent=luggageInfo;
-document.getElementById('checkout-content').textContent=checkoutInfo;
-document.getElementById('office-content').textContent=officeInfo;
-document.getElementById('rules-content').textContent=rulesInfo;
-
-function toggle(id){document.getElementById(id).classList.toggle('show')}
 </script>
 </body>
 </html>
