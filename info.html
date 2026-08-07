@@ -46,93 +46,78 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f8f9fa;
 </div>
 <script>
 const P=new URLSearchParams(location.search);
-const room=(P.get('room')||'').trim();
+const room=(P.get('room')||'').trim().toUpperCase();
 const name=decodeURIComponent(P.get('name')||'');
 document.getElementById('gname').textContent='Welcome, '+name;
-document.getElementById('groom').textContent=room;
+document.getElementById('groom').textContent=P.get('room')||'';
 
-// Determine property type
-const isHotel16=room.toUpperCase().startsWith('NO16');
-const isHotel17=room.toUpperCase().startsWith('NO17') && !room.toUpperCase().includes('NO17/');
-const isHotel=isHotel16||isHotel17;
+const isH16=room.indexOf('NO16')===0;
+const isH17=room.indexOf('NO17')===0 && room.indexOf('NO17/')<0 && room.indexOf('NO17-1')!==0;
+const isHotel=isH16||isH17;
 
-// Extract room number for hotels
 let roomNum='';
-if(isHotel){
-  const parts=room.split('-');
-  if(parts.length>1) roomNum=parts[parts.length-1];
-  else roomNum=room.replace(/\D+/g,'').slice(2);
-}
+if(isHotel){const p=room.split('-');roomNum=p.length>1?p[p.length-1]:room.replace(/[^0-9]/g,'').slice(2);}
 
-// Hotel passwords
-const pw16={31:'6131',32:'6132',33:'6133',34:'6934',35:'6335',36:'6236',37:'6337',38:'6238',39:'6439',41:'6241',42:'6042',43:'6347',44:'6344',45:'6145',46:'6046',50:'6250',25:'6551'};
-const pw17={'1':'7101','2':'7102','3':'7103','4':'7904','5':'7905','6':'7206','7':'7307','8':'7208','9':'7409','10':'7210','12':'7012','14':'7314','15':'7115','16':'7016','17':'7317','19':'7219','20':'7220','21':'7521','01':'7101','02':'7102','03':'7103','04':'7904','05':'7905','06':'7206','07':'7307','08':'7208','09':'7409'};
+const pw16={'25':'6551','31':'6131','32':'6132','33':'6133','34':'6934','35':'6335','36':'6236','37':'6337','38':'6238','39':'6439','41':'6241','42':'6042','43':'6347','44':'6344','45':'6145','46':'6046','50':'6250'};
+const pw17={'1':'7101','2':'7102','3':'7103','4':'7904','5':'7905','6':'7206','7':'7307','8':'7208','9':'7409','10':'7210','12':'7012','14':'7314','15':'7115','16':'7016','17':'7317','19':'7219','20':'7220','21':'7521'};
 
-// Apartment data
 const apts={
-'NO 1':{key:'Find the green door (number 2). Look for the ORANGE key box on the wall.\n\nCode: 1678\n\nAlign code on dials \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table where it is easy to see. Lock the door.'},
-'NO 2':{key:'Find the RED key box at door number 6 (circled in red).\n\nCode: 1678\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Enter via intercom, find door number 2.',parking:'Parking is at the end of the corridor at door 6.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 4':{key:'At door number 24, find the RED key box on the iron railing (far right).\n\nCode: 1678\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door number 4.',parking:'After check-in, find the parking card on the cabinet in the living room. Place it on your windshield.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 5/2':{key:'After arriving at number 5, find the RED key box on the window ledge.\n\nCode: 2378\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find the brown door marked "2".',parking:'Find the parking card on the cabinet. Place on windshield. East Preston Street, number 24.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 6':{key:'At door number 24, find the RED key box on the iron railing (far left).\n\nCode: 7521\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door number 6.',parking:'Find the parking card on the cabinet. Place on windshield. East Preston Street, number 24.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 7':{key:'Yellow brick building. Find the blue door number 7. RED key box on the door.\n\nCode: 7206\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.',parking:'Private parking to the left of the property. Your space is number 7.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 7A':{key:'Stone building. Light blue door number 7. Row of key boxes. Look for the BLUE key box at the bottom (circled in red).\n\nCode: 7307\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 9':{key:'Yellow brick building. Blue door number 9. GREY key box (Master Lock) on the wall.\n\nCode: 1678\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.',parking:'Private parking to the left of the property. Your space is number 9.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 11':{key:'Find door number 108 (black door). GREY key box on the door frame (next to small blue box).\n\nCode: 7206\n\nAfter getting the key:\n1. Do NOT enter 108. Walk to door number 110\n2. Hold the sensor key against the white door panel\n3. Find the white door marked "2"\n4. Use the key to open it',parking:'Please check the road signs in your area for parking restrictions.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 14':{key:'Enter from Gilmour Street entrance (marked NO 1 Entrance). Inside, find the BLUE key box on the door frame (circled in red).\n\nCode: 1678\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door number 4.',parking:'Private parking on Gilmour Street, space marked 1/4.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 17/1':{key:'Find black door number 17. ORANGE key box on the left side (NOT the purple one next to it).\n\nCode: 1678\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 22':{key:'Find the BLUE key box on door number 24.\n\nCode: 7307\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Your apartment is number 4 in building 22.',parking:'Find the parking card on the cabinet in the living room. Place it on your windshield.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
-'NO 23':{key:'Find green door number 23. Row of key boxes. Look for the BLUE key box (circled in red).\n\nCode: 7307\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 25':{key:'Red building. Red door number 255. Several key boxes. Look for the BLUE key box.\n\nCode: 7307\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "2".',parking:'Please check the road signs in your area for parking restrictions.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 41':{key:'Find the iron gate (number 4, arrow pointing left). Main door code: C1369Z\n\nWalk through corridor to balcony area. Find the red door with GREEN key box.\n\nCode: 1678\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 66':{key:'Find building number 66. RED key box on the window ledge.\n\nCode: 1678\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.\nPress button 66 on the intercom to open main door. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 73':{key:'White house. Door number 73. RED key box next to the front door.\n\nCode: 1678\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Take the blue key. Open front door.',parking:'Private parking in the driveway.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
-'NO 86':{key:'Blue door number 86. ORANGE key box next to the window.\n\nCode: 1678\n\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Take the blue key. Open the door.',parking:'Please check the road signs in your area for parking restrictions.',checkout:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'}
+'NO 17/1':{key:'Find black door number 17. ORANGE key box on the left side (NOT the purple one next to it).\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 7A':{key:'Stone building. Light blue door number 7. Row of key boxes. Look for the BLUE key box at the bottom (circled in red).\nCode: 7307\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 5/2':{key:'After arriving at number 5, find the RED key box on the window ledge.\nCode: 2378\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find the brown door marked "2".',parking:'Find the parking card on the cabinet. Place on windshield. East Preston Street, number 24.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
+'NO 66':{key:'Find building number 66. RED key box on the window ledge.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.\nPress button 66 on the intercom to open main door. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 73':{key:'White house. Door number 73. RED key box next to the front door.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Take the blue key. Open front door.',parking:'Private parking in the driveway.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 86':{key:'Blue door number 86. ORANGE key box next to the window.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Take the blue key. Open the door.',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 41':{key:'Find the iron gate (number 4, arrow pointing left). Main door code: C1369Z\nWalk through corridor to balcony area. Find the red door with GREEN key box.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 25':{key:'Red building. Red door number 255. Several key boxes. Look for the BLUE key box.\nCode: 7307\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "2".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 23':{key:'Find green door number 23. Row of key boxes. Look for the BLUE key box (circled in red).\nCode: 7307\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 22':{key:'Find the BLUE key box on door number 24.\nCode: 7307\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Your apartment is number 4 in building 22.',parking:'Find the parking card on the cabinet in the living room. Place it on your windshield.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
+'NO 14':{key:'Enter from Gilmour Street entrance (marked NO 1 Entrance). Inside, find the BLUE key box on the door frame (circled in red).\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door number 4.',parking:'Private parking on Gilmour Street, space marked 1/4.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 11':{key:'Find door number 108 (black door). GREY key box on the door frame (next to small blue box).\nCode: 7206\nAfter getting the key:\n1. Do NOT enter 108. Walk to door number 110\n2. Hold the sensor key against the white door panel\n3. Find the white door marked "2"\n4. Use the key to open it',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'},
+'NO 9':{key:'Yellow brick building. Blue door number 9. GREY key box (Master Lock) on the wall.\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.',parking:'Private parking to the left of the property. Your space is number 9.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
+'NO 7':{key:'Yellow brick building. Find the blue door number 7. RED key box on the door.\nCode: 7206\nAlign code \u2192 push black button DOWN \u2192 pull cover outward.',parking:'Private parking to the left of the property. Your space is number 7.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
+'NO 6':{key:'At door number 24, find the RED key box on the iron railing (far left).\nCode: 7521\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door number 6.',parking:'Find the parking card on the cabinet. Place on windshield. East Preston Street, number 24.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
+'NO 4':{key:'At door number 24, find the RED key box on the iron railing (far right).\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Find door number 4.',parking:'After check-in, find the parking card on the cabinet in the living room. Place it on your windshield.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
+'NO 2':{key:'Find the RED key box at door number 6 (circled in red).\nCode: 1678\nAlign code \u2192 push black button DOWN \u2192 pull cover outward. Enter via intercom, find door number 2.',parking:'Parking is at the end of the corridor at door 6.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key AND parking card on the dining table. Lock the door.'},
+'NO 1':{key:'Find the green door (number 2). Look for the ORANGE key box on the wall.\nCode: 1678\nAlign code on dials \u2192 push black button DOWN \u2192 pull cover outward. Find door marked "1".',parking:'Please check the road signs in your area for parking restrictions.',co:'Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.'}
 };
 
-// Find matching apartment
 let aptData=null;
-const roomUpper=room.toUpperCase().replace(/-/g,' ').replace(/\s+/g,' ').trim();
-for(const[k,v] of Object.entries(apts)){
-  if(roomUpper.includes(k.replace('/','/'))){ aptData=v; break; }
-}
-// Try simpler match
-if(!aptData){
-  const simpleRoom=room.replace(/\s+/g,'').toUpperCase();
-  for(const[k,v] of Object.entries(apts)){
-    const simpleK=k.replace(/\s+/g,'').toUpperCase();
-    if(simpleRoom.includes(simpleK)||simpleRoom===simpleK){ aptData=v; break; }
+if(!isHotel){
+  const r=room.replace(/-/g,' ').replace(/\s+/g,' ').trim();
+  const keys=Object.keys(apts).sort((a,b)=>b.length-a.length);
+  for(const k of keys){
+    if(r.indexOf(k)===0||r===k||r.replace(/\s/g,'')===k.replace(/\s/g,'')){ aptData=apts[k]; break; }
   }
 }
 
 let keyInfo='',parkingInfo='',luggageInfo='',checkoutInfo='';
-
-if(isHotel16){
+if(isH16){
   const code=pw16[roomNum]||'(check Booking.com message)';
-  keyInfo='Find the row of RED key boxes on the left side of the entrance.\n\nYour locker number: '+roomNum+'\nYour code: '+code+'\n\nThe key opens BOTH the main door and your room.';
+  keyInfo='Find the row of RED key boxes on the left side of the entrance.\nYour locker number: '+roomNum+'\nYour code: '+code+'\nThe key opens BOTH the main door and your room.';
   parkingInfo='There is NO parking at the hotel.\n\n\u26a0\ufe0f Marked bays = resident permit only (you WILL be ticketed)\n\u26a0\ufe0f Yellow lines = fines apply\n\u26a0\ufe0f The car park at No.15 next door is strictly private. Parking there = \u00a3250 fine from the owner.';
-  luggageInfo='The luggage storage keys are kept in box number 49.\nPasscode: 6249\n\nYou may store your luggage in boxes A, B, C, D, E, F, or G.\n\nEach box has keys that open both the luggage box and the main door.\nPlease return the keys to box 49 once you have collected your luggage.';
-  checkoutInfo='Check-out by 10:30 AM strictly.\n\nDrop your key into the PINK key box in the lobby.';
-}else if(isHotel17){
-  const code=pw17[roomNum]||pw17['0'+roomNum]||'(check Booking.com message)';
-  keyInfo='Find the row of GREY key boxes on the left side of the entrance.\n\nYour locker number: '+roomNum+'\nYour code: '+code+'\n\nThe key opens BOTH the main door and your room.';
+  luggageInfo='The luggage storage keys are kept in box number 49.\nPasscode: 6249\nYou may store your luggage in boxes A, B, C, D, E, F, or G.\nEach box has keys that open both the luggage box and the main door.\nPlease return the keys to box 49 once you have collected your luggage.';
+  checkoutInfo='Check-out by 10:30 AM strictly.\nDrop your key into the PINK key box in the lobby.';
+}else if(isH17){
+  const code=pw17[roomNum]||pw17[String(Number(roomNum))]||'(check Booking.com message)';
+  keyInfo='Find the row of GREY key boxes on the left side of the entrance.\nYour locker number: '+roomNum+'\nYour code: '+code+'\nThe key opens BOTH the main door and your room.';
   parkingInfo='There is NO parking at the hotel.\n\n\u26a0\ufe0f Marked bays = resident permit only (you WILL be ticketed)\n\u26a0\ufe0f Yellow lines = fines apply\n\u26a0\ufe0f The car park at No.15 next door is strictly private. Parking there = \u00a3250 fine from the owner.';
-  luggageInfo='The luggage storage keys are kept in box number 23.\nPasscode: 1678\n\nYou may store your luggage in boxes A, B, C, D, and E.\n\nEach box has keys that open both the luggage box and the main door.\nPlease return the keys to box 23 once you have collected your luggage.';
-  checkoutInfo='Check-out by 10:30 AM strictly.\n\nDrop your key into the PINK key box in the lobby.';
+  luggageInfo='The luggage storage keys are kept in box number 23.\nPasscode: 1678\nYou may store your luggage in boxes A, B, C, D, and E.\nEach box has keys that open both the luggage box and the main door.\nPlease return the keys to box 23 once you have collected your luggage.';
+  checkoutInfo='Check-out by 10:30 AM strictly.\nDrop your key into the PINK key box in the lobby.';
 }else if(aptData){
   keyInfo=aptData.key;
   parkingInfo=aptData.parking;
-  luggageInfo='We do not offer luggage storage at this property.\n\nPlease visit: 16 Mayfield Gardens, Edinburgh EH9 2BZ\n\nThe luggage storage keys are kept in box number 49. Passcode: 6249. Boxes A-G.';
-  checkoutInfo=aptData.checkout;
+  luggageInfo='We do not offer luggage storage at this property.\nPlease visit: 16 Mayfield Gardens, Edinburgh EH9 2BZ\nThe luggage storage keys are kept in box number 49. Passcode: 6249. Boxes A-G.';
+  checkoutInfo=aptData.co;
 }else{
   keyInfo='Your key information was sent via Booking.com message. Please check your Booking.com App.';
   parkingInfo='Please check the road signs in your area for parking restrictions.';
-  luggageInfo='We do not offer luggage storage at this property.\n\nPlease visit: 16 Mayfield Gardens, Edinburgh EH9 2BZ\n\nPasscode: 6249. Boxes A-G.';
+  luggageInfo='We do not offer luggage storage at this property.\nPlease visit: 16 Mayfield Gardens, Edinburgh EH9 2BZ\nPasscode: 6249. Boxes A-G.';
   checkoutInfo='Check-out by 10:30 AM strictly. Turn off all power. Leave the key on the dining table. Lock the door.';
 }
 
-const officeInfo='Office hours: 9:30 AM - 7:30 PM daily.\n\nOutside office hours, please contact us via the Booking.com App.';
-const rulesInfo='Please keep quiet to avoid disturbing other guests or residents.\n\nDo not ring any doorbells.\n\nIf you need help, please contact us via Booking.com App.';
+const officeInfo='Office hours: 9:30 AM - 7:30 PM daily.\nOutside office hours, please contact us via the Booking.com App.';
+const rulesInfo='Please keep quiet to avoid disturbing other guests or residents.\nDo not ring any doorbells.\nIf you need help, please contact us via Booking.com App.';
 
 document.getElementById('key-content').textContent=keyInfo;
 document.getElementById('parking-content').textContent=parkingInfo;
@@ -141,7 +126,7 @@ document.getElementById('checkout-content').textContent=checkoutInfo;
 document.getElementById('office-content').textContent=officeInfo;
 document.getElementById('rules-content').textContent=rulesInfo;
 
-function toggle(id){const el=document.getElementById(id);el.classList.toggle('show')}
+function toggle(id){document.getElementById(id).classList.toggle('show')}
 </script>
 </body>
 </html>
