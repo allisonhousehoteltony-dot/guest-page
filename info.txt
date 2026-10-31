@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Guest Info</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f9fa;min-height:100vh;padding:20px;color:#333}
+.container{max-width:500px;margin:0 auto}
+.header{background:#fff;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);text-align:center}
+.verified{display:inline-flex;align-items:center;gap:8px;background:#e8f5e9;color:#2e7d32;padding:8px 16px;border-radius:20px;font-size:14px;font-weight:600;margin-bottom:12px}
+.welcome{font-size:18px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.btn{background:#fff;border:2px solid transparent;border-radius:14px;padding:20px 12px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.06);cursor:pointer;font:inherit;color:inherit;transition:transform .1s,box-shadow .1s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(0,0,0,0.1)}
+.btn.active{border-color:#2196F3}
+.btn .icon{font-size:28px;margin-bottom:8px;display:block}
+.btn .label{font-size:14px;font-weight:600}
+.panel{background:#fff;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);display:none}
+.panel.active{display:block}
+.panel h3{font-size:17px;margin-bottom:12px;color:#1a1a1a}
+.panel p{font-size:15px;color:#444;line-height:1.6;margin-bottom:10px}
+.panel p:last-child{margin-bottom:0}
+.code{font-size:30px;font-weight:700;color:#2196F3;letter-spacing:3px;margin:6px 0 12px}
+.label-sm{font-size:14px;color:#777;margin-bottom:0!important}
+.warn{background:#fff8e1;border-radius:10px;padding:10px 12px;font-weight:600}
+.back{text-align:center;margin:16px 0}
+.back a{color:#666;font-size:14px;text-decoration:none}
+.security{background:#fff;border-radius:16px;padding:16px;text-align:center;font-size:13px;color:#999;box-shadow:0 2px 10px rgba(0,0,0,0.06)}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="verified">✓ Booking Verified</div>
+    <div class="welcome">Welcome, <span id="guestName"></span></div>
+  </div>
+  <div class="buttons" id="buttons"></div>
+  <div class="panel" id="panel"><h3 id="panelTitle"></h3><div id="panelBody"></div></div>
+  <div class="back"><a href="guest.html">← Back to verification</a></div>
+  <div class="security">🔒 This is a secure service channel. We will never ask for payment or personal details here.</div>
+</div>
+<script>
+// NOTE: No door, room or key box codes are stored in this file.
+// Codes arrive only from Make after verification, via ?code= and ?lc= in the URL.
+const D = {"apts": {"NO 1": ["F1, 2 King's Stables Road, Edinburgh EH1 2JY", "Find the ORANGE key box next to the green front door (door number 2, by the Caley Water sign). Take the key, enter the building, find the door marked \"1\" and use a coin to turn the lock.", "在门牌 2 号的绿色大门旁（Caley Water 标志旁）找到橙色钥匙盒。取出钥匙进入大楼，找到门牌「1」的房门，用硬币拧开门锁。", "no1", false], "NO 2": ["F2, 6 Hawkhill Close, Edinburgh EH7 6FE", "Find the RED key box on the door frame at the entrance (next to the intercom). Take the key, walk down the corridor to door 6, then find door 2.", "在入口门框上（对讲机旁）找到红色钥匙盒。取出钥匙，沿走廊走到 6 号门，再找到 2 号门。", "no2", false], "NO 4": ["24-4 Causewayside, Edinburgh EH9 1QB", "At door number 24 there are three key boxes on the iron railing. Use the RED key box on the far RIGHT.", "24 号木门旁的铁栏杆上有三个钥匙盒，请用最右边的红色钥匙盒。", "permit", false], "NO 5/2": ["5/2 Sciennes House Place, Edinburgh EH9 1NN", "Enter through the blue door in the stone alley. The RED key box is on the window ledge. Walk through the stone corridor to the brown door marked \"2\".", "从石墙小巷的蓝色门进入，红色钥匙盒在窗台上。穿过石墙走廊，找到门牌「2」的棕色房门。", "permit_walk", false], "NO 5A": ["5A Pirrie Street, Edinburgh EH6 5HU", "Find the key box near the entrance.", "在入口附近找到钥匙盒。", "none", false], "NO 6": ["24/6 Causewayside, Edinburgh EH9 1QB", "At door number 24 there are three key boxes on the iron railing. Use the RED key box on the far LEFT.", "24 号木门旁的铁栏杆上有三个钥匙盒，请用最左边的红色钥匙盒。", "permit", false], "NO 7": ["7 Mentone Gardens, Edinburgh EH9 2DJ", "Find the blue door number 7. The GREY key box is on the door.", "找到蓝色的 7 号大门，灰色钥匙盒在门上。", "mentone", false], "NO 7A": ["7/1 Upper Grove Place, Edinburgh EH3 8AY", "Find the light blue door number 7. Use the BLUE key box at the bottom of the row. Enter and find the door marked \"1\".", "找到浅蓝色的 7 号大门，用一排钥匙盒中最下面的蓝色钥匙盒。进入后找到门牌「1」的房门。", "none", false], "NO 9": ["9 Mentone Gardens, Edinburgh EH9 2DJ", "Find the blue door number 9. The GREY key box is on the wall.", "找到蓝色的 9 号大门，灰色钥匙盒在墙上。", "mentone", false], "NO 11": ["110-2 Nicolson Street, Edinburgh EH8 9EJ", "First go to the black door number 108. The BLUE key box is on the door frame (not the small grey box). Do NOT enter 108: walk to the next black door, number 110, hold the key fob against the door panel, then find the white door marked \"2\".", "先到 108 号黑色大门，蓝色钥匙盒在门框上（不是旁边的灰色小盒）。不要进 108 号，走到旁边的 110 号黑色大门，用钥匙感应门禁，进去后找到门牌「2」的白色房门。", "none", false], "NO 12": ["11 Mentone Gardens, Edinburgh EH9 2DJ", "Find the blue door number 11. The GREY key box is on the right-hand side of the door.", "找到蓝色的 11 号大门，灰色钥匙盒在门的右手边。", "mentone", false], "NO 14": ["1/4 Gilmours Entry, Edinburgh EH8 9XL", "Enter from the Gilmour Street entrance (marked NO 1 Entrance). The BLUE key box is on the door frame to the right. Then find the wooden door number 4.", "从 Gilmour Street 入口（标示 NO 1 Entrance）进入，蓝色钥匙盒在右边门框上。然后找到 4 号木门。", "no14", false], "NO 17/1": ["GF1, 17 Upper Grove Place, Edinburgh EH3 8AX", "Find the black door number 17. Use the ORANGE key box on the left (not the purple one). Enter and find the door marked \"1\".", "找到 17 号黑色大门，用左边的橙色钥匙盒（不是紫色那个）。进入后找到门牌「1」的房门。", "none", false], "NO 18": ["Flat 11, 18 Terrars Croft, Edinburgh EH8 9RE", "Find the BLUE key box near the entrance.", "在入口附近找到蓝色钥匙盒。", "none", false], "NO 23": ["23/2 Livingstone Place, Edinburgh EH9 1PD", "Find the green door number 23. Use the BLUE key box in the row next to the door.", "找到 23 号绿色大门，用门旁一排钥匙盒中的蓝色钥匙盒。", "none", false], "NO 25": ["255/2 Canongate, Edinburgh EH8 8BQ", "Find the red door number 255. Use the BLUE key box (the one at the bottom).", "找到 255 号红色大门，用最下面的蓝色钥匙盒。", "none", false], "NO 41": ["4/1 Tron Square, Edinburgh EH1 1RR", "Find the iron gate number 4 (arrow pointing left, marked 4/1-15). The gate code is in your Booking.com message. Walk along the corridor to the balcony area and find the red door. The GREEN key box is next to it.", "找到 4 号铁门（箭头指左，标示 4/1-15），铁门密码在您的 Booking.com 消息里。沿走廊走到阳台处，找到红色房门，绿色钥匙盒就在旁边。", "none", true], "NO 66": ["Flat 1, 66 Ferry Gait Drive, Edinburgh EH4 4GJ", "The RED key box is on the window ledge of building 66. Take the key, press button 66 on the intercom to open the main door, then find the door marked \"1\".", "66 号楼窗台上有红色钥匙盒。取出钥匙，按对讲机上的 66 号按钮开大门，然后找到门牌「1」的房门。", "free", false], "NO 73": ["73 Ravenswood Avenue, Edinburgh EH16 5TG", "White house, door number 73. The RED key box is next to the front door. Take the blue key to open the door.", "白色外墙房屋，门牌 73 号。红色钥匙盒在大门旁，取出蓝色钥匙开门。", "driveway", true], "NO 86": ["GF1, 86 Grove Street, Edinburgh EH3 8AP", "Find the blue door number 86. The ORANGE key box is next to the window. Take the blue key to open the door.", "找到 86 号蓝色大门，橙色钥匙盒在窗户旁。取出蓝色钥匙开门。", "none", false], "NO 17G1": ["GF1, 17 Upper Grove Place, Edinburgh EH3 8AX", "Find the black door number 17. Use the ORANGE key box on the left (not the purple one). Enter and find the door marked \"1\".", "找到 17 号黑色大门，用左边的橙色钥匙盒（不是紫色那个）。进入后找到门牌「1」的房门。", "none", false]}, "parking": {"none": ["This property has no dedicated parking. Please only park on the street where the signs allow it.", "本物业没有专用车位，请只在路牌允许的路边停车。"], "no1": ["No dedicated parking. Please do not park in residents' bays (you will be fined). Pay-and-display bays nearby are free after 6:30 pm.", "没有专用车位。请不要停居民车位（会被罚款）。附近的收费车位晚上 6:30 后免费。"], "no2": ["You can park on the street or in the underground car park. The garage key is on the bar counter in the apartment. The car park is at the end of the corridor, door 6.", "可以停在路边，也可以用地下停车场。车库钥匙在公寓吧台上。停车场在走廊尽头的 6 号门。"], "permit": ["Free parking at the East Preston Street car park. The parking permit is on the counter or cupboard in the apartment: place it on your windscreen and park in any space. Without the permit you will get a ticket. Please leave the permit in the apartment when you check out.", "可免费停在 East Preston Street 停车场。停车卡在公寓的台面或柜子上，请放在挡风玻璃前，场内任意车位都可以停。没有停车卡会被开罚单。退房时请把停车卡留在公寓里。"], "permit_walk": ["Free parking at the East Preston Street car park, a short walk away. The parking permit is on the counter or cupboard in the apartment: place it on your windscreen and park in any space. Without the permit you will get a ticket. Please leave the permit in the apartment when you check out.", "可免费停在 East Preston Street 停车场，需步行过去。停车卡在公寓的台面或柜子上，请放在挡风玻璃前，场内任意车位都可以停。没有停车卡会被开罚单。退房时请把停车卡留在公寓里。"], "mentone": ["Private parking on the left-hand side of the house, with the space numbers marked on the ground. The spaces for No 7, 9 and 12 are shared. No permit needed. You can also park in unrestricted spots in front of the house.", "房子左手边有私人车位，地上有写车位号码。No 7、9、12 三个车位共用，不需要停车卡。门前没有限制的位置也可以停。"], "no14": ["Your private parking space is on Gilmour Street, marked 1/4. The space has a parking barrier: unlock it with the barrier key in the apartment. Please lock the barrier again every time you leave the space, otherwise other cars may park there.", "您的私人车位在 Gilmour Street，标记 1/4。车位有停车杆，请用公寓里的停车杆钥匙开锁。每次离开车位时请重新锁好停车杆，否则其他车辆可能会停进去。"], "free": ["Free parking: you can use any available space.", "免费停车，任意空位都可以停。"], "driveway": ["Private parking on the driveway in front of the house.", "房子门前的车道是私人车位。"]}, "hotel": {"16": {"name": "No 16 Hotel", "addr": "16 Mayfield Gardens, Edinburgh EH9 2BZ", "parking": ["Limited parking in front of the building (not guaranteed). Free street parking nearby: Bright's Crescent, Peel Terrace, Glenorchy Terrace and Cobden Road. Please avoid yellow lines, white lines and permit bays.", "门前车位有限，不保证有位。附近免费路边停车：Bright's Crescent、Peel Terrace、Glenorchy Terrace、Cobden Road。请避开黄线、白线和持证车位。"], "luggage": ["If you arrive before check-in or after check-out, free luggage storage is available here at 16 Mayfield Gardens, EH9 2BZ, at any time.", "Key collection: Box 49", "Inside Box 49 you'll find the main door key (tied with a yellow rubber band) and your locker key (locker A, B or C). You may keep the locker key while your luggage is stored. Please return both keys to Box 49 after collecting your luggage."], "luggage_zh": "如果您在入住前到达或退房后需要寄存行李，可以免费存放在 16 Mayfield Gardens, EH9 2BZ，任何时间都可以。取钥匙：49 号盒，密码 [Make 传入]。盒内有大门钥匙（绑黄色橡皮筋）和储物柜钥匙（A、B 或 C 柜）。寄存期间可以保留储物柜钥匙，取回行李后请把两把钥匙都放回 49 号盒。"}, "17": {"name": "No 17 Hotel", "addr": "17 Mayfield Gardens, Edinburgh EH9 2AX", "parking": ["Limited parking in front of the building (not guaranteed). Free street parking nearby: Bright's Crescent, Peel Terrace, Glenorchy Terrace and Cobden Road. Please avoid yellow lines, white lines and permit bays. ⚠️ Do NOT park in the car park at No 15 next door: it is private and you may be fined £250.", "门前车位有限，不保证有位。附近免费路边停车：Bright's Crescent、Peel Terrace、Glenorchy Terrace、Cobden Road。请避开黄线、白线和持证车位。⚠️ 不要停隔壁 15 号的停车场，那是私人区域，会被罚款 £250。"], "luggage": ["If you arrive before check-in or need to store your luggage after check-out, free luggage storage is available here at 17 Mayfield Gardens, EH9 2AX, at any time.", "Key collection: Box 23", "Inside Box 23 you'll find the main entrance key, attached with a cable. PLEASE DO NOT KEEP THIS KEY: return it to Box 23 after entering. The luggage lockers are on the right-hand side of the lobby. You may keep the locker key while your luggage is stored. Please return the locker key after collecting your luggage."], "luggage_zh": "如果您在入住前到达或退房后需要寄存行李，可以免费存放在 17 Mayfield Gardens, EH9 2AX，任何时间都可以。取钥匙：23 号盒，密码 [Make 传入]。盒内是绑着钢索的大门钥匙，请不要带走，进门后放回 23 号盒。行李储物柜在大堂右手边。寄存期间可以保留储物柜钥匙，取回行李后请归还储物柜钥匙。"}}, "apt_luggage": ["If you arrive before check-in or after check-out, free luggage storage is available at 16 Mayfield Gardens, EH9 2BZ, at any time.", "Key collection: Box 49", "Inside Box 49 you'll find the main door key (tied with a yellow rubber band) and your locker key (locker A, B or C). You may keep the locker key while your luggage is stored. Please return both keys to Box 49 after collecting your luggage."], "T": {"code_missing_box": "Your key box code was sent in your Booking.com message.", "code_missing_locker": "Your locker code was sent in your Booking.com message.", "code_missing_luggage": "The box code was sent in your Booking.com message."}};
+const q = new URLSearchParams(window.location.search);
+const room = (q.get('room') || '').trim();
+const name = (q.get('name') || '').trim();
+const clean = v => (v || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 12);
+const code = clean(q.get('code'));
+const lc = clean(q.get('lc'));
+document.getElementById('guestName').textContent = name || 'Guest';
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const P = s => '<p>' + esc(s) + '</p>';
+const codeBlock = (label, value, missing) => value
+  ? '<p class="label-sm">' + esc(label) + '</p><div class="code">' + esc(value) + '</div>'
+  : P(missing);
+
+const sections = [
+  ['key','🔑','Key / Check-in'],['parking','🚗','Parking'],
+  ['luggage','🧳','Luggage Storage'],['checkout','🏁','Check-out'],
+  ['office','🏢','Office Hours'],['rules','📋','House Rules']
+];
+const data = {};
+
+const hm = room.toUpperCase().match(/^NO\s*1([67])\s*-+\s*0*(\d+)$/);
+if (hm) {
+  const h = D.hotel['1' + hm[1]], n = hm[2];
+  const locker = ({'6-43':'47'})[hm[1] + '-' + n] || n;
+  data.key = P(h.name + ' – ' + h.addr) +
+    P('Your room: Room ' + n) +
+    P('Your key is in Locker ' + locker + ', in the locker area on the left-hand side of the front door.') +
+    codeBlock('Locker code', code, D.T.code_missing_locker) +
+    '<p class="warn">⚠️ This key opens BOTH the main door and your room.</p>' +
+    P('Check-in: from 14:00, any time after.');
+  data.parking = P(h.parking[0]);
+  data.luggage = P(h.luggage[0]) + P(h.luggage[1]) + codeBlock('Box code', lc, D.T.code_missing_luggage) + P(h.luggage[2]);
+  data.checkout = P('Check-out: 10:30 am') + P('Please post your room key into the pink box in the lobby.');
+  data.office = P('Self check-in is available 24 hours.') + P('Office hours: 9:30 am – 7:30 pm.') +
+    P('Outside office hours, please contact us via the Booking.com app or the doorbell at the gate.');
+  data.rules = P('1. No smoking anywhere in the building.') + P('2. No parties or loud noise after 10 pm.') +
+    P('3. No extra guests beyond those on the booking.') + P('4. Please report any damage immediately.');
+} else if (D.apts[room.toUpperCase()]) {
+  const a = D.apts[room.toUpperCase()];
+  data.key = P('Address: ' + a[0]) + P(a[1]) +
+    codeBlock('Key box code', code, D.T.code_missing_box) +
+    P('How to open: turn the dials to the code, push the black button at the bottom down and pull the cover outward.');
+  data.parking = P(D.parking[a[3]][0]);
+  data.luggage = P(D.apt_luggage[0]) + P(D.apt_luggage[1]) + codeBlock('Box code', lc, D.T.code_missing_luggage) + P(D.apt_luggage[2]);
+  data.checkout = P('Check-out: 10:30 am') +
+    (a[4] ? P('1. Lock the front door with the key.') + P('2. Put the key back in the key box.') + P('3. Scramble the key box dials.')
+          : P('1. Close the door firmly.') + P('2. Put the key back in the key box.') + P('3. Scramble the key box dials.'));
+  data.office = P('Office hours: 9:30 am – 7:30 pm.') + P('Outside office hours, please contact us via the Booking.com app.');
+  data.rules = P('1. No smoking inside the property.') + P('2. No parties or events.') + P('3. Quiet hours: 10 pm – 8 am.') +
+    P('4. Please take the rubbish out before you leave.') + P('5. Please report any damage immediately via Booking.com.');
+} else {
+  data.key = P('Your key information was sent in your Booking.com message. Please check the Booking.com app.');
+  data.parking = P('Please check your Booking.com message for parking details.');
+  data.luggage = P('Please contact us via Booking.com for luggage storage options.');
+  data.checkout = P('Check-out: 10:30 am') + P('Please check your Booking.com message for instructions.');
+  data.office = P('Office hours: 9:30 am – 7:30 pm.') + P('Please contact us via the Booking.com app.');
+  data.rules = P('No smoking. No parties. Quiet hours 10 pm – 8 am.');
+}
+
+const btnWrap = document.getElementById('buttons');
+sections.forEach(([id, icon, label]) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'btn'; b.dataset.id = id;
+  b.innerHTML = '<span class="icon">' + icon + '</span><span class="label">' + label + '</span>';
+  b.onclick = () => show(id, icon + ' ' + label);
+  btnWrap.appendChild(b);
+});
+function show(id, title) {
+  document.querySelectorAll('.btn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+  document.getElementById('panelTitle').textContent = title;
+  document.getElementById('panelBody').innerHTML = data[id];
+  const p = document.getElementById('panel'); p.classList.add('active');
+  p.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+</script>
+</body>
+</html>
